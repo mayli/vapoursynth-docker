@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag vapoursynth-docker:latest
+
+    - name: Login
+      run: docker login docker.pkg.github.com --username mayli -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Tag & Push
+      run: |
+        docker tag vapoursynth-docker:latest docker.pkg.github.com/mayli/vapoursynth-docker/vapoursynth-docker:$(date +%y%m%d)
+        docker tag vapoursynth-docker:latest docker.pkg.github.com/mayli/vapoursynth-docker/vapoursynth-docker:latest
+        docker push docker.pkg.github.com/mayli/vapoursynth-docker/vapoursynth-docker:$(date +%y%m%d)
+        docker push docker.pkg.github.com/mayli/vapoursynth-docker/vapoursynth-docker:latest
